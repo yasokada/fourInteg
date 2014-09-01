@@ -48,6 +48,13 @@ C		print *, idx, b1 / idx
 	a1 = a1 / pi / max_loop
 	b1 = b1 / pi / max_loop
 
+	theta = 0d0
+	do while(theta <= 180d0)
+		mu = cos(theta * pi / 180d0) 
+		print *, theta, Rayleigh(mu)
+		theta = theta + 1d-1
+	end do
+
 C	print *, 'a0=', a0
 C	print *, 'a1=', a1
 C	print *, 'b1=', b1
