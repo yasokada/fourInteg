@@ -3,7 +3,7 @@
 	real*8 y
 	real*8 x
 	real*8 Rayleigh
-	real*8 a0, a1, b1
+C	real*8 a0, a1, b1
 	real*8 as, bs
 	dimension as(0:10)
 	dimension bs(10)
@@ -34,8 +34,6 @@ C		print *, x, y
 C		x = x + 1d-1
 C	end do
 
-	b1 = 0d0
-
 	as(0) = 0d0
 	do idx = 1, 10
 		as(idx) = 0d0
@@ -44,14 +42,14 @@ C	end do
 
 	do idx = 1, max_loop
 		call Halton_sequence(idx, x0, y0)
-		mu = (x0 * 2d0) - 1d0            ! -1.0 to 1.0
+		mu = (x0 * 2d0) - 1d0            ! [-1.0,1.0]
 		theta = acos(mu) * 180.0 / pi
 C		print *, idx, theta
 
-		as(0) = as(0) + Rayleigh(mu) * cos(mu * 0)
+		as(0) = as(0) + Rayleigh(mu) * cos(mu * dble(0))
 		do ni=1,10
-			as(ni) = as(ni) + Rayleigh(mu) * cos(mu * ni)
-			bs(ni) = bs(ni) + Rayleigh(mu) * sin(mu * ni)
+			as(ni) = as(ni) + Rayleigh(mu) * cos(mu * dble(ni))
+			bs(ni) = bs(ni) + Rayleigh(mu) * sin(mu * dble(ni))
 		end do
 C		b1 = b1 + Rayleigh(mu) * sin(mu * 1)
 C		print *, idx, b1 / idx
@@ -69,8 +67,8 @@ C		print *, idx, b1 / idx
 		
 		res = 0.5d0 * as(0)
 		do ni=1,10
-			res = res + as(ni) * cos(mu * ni)
-			res = res + bs(ni) * sin(mu * ni)
+			res = res + as(ni) * cos(mu * dble(ni))
+			res = res + bs(ni) * sin(mu * dble(ni))
 		end do
 
 C		print *, theta, Rayleigh(mu)
