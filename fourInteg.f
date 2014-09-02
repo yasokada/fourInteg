@@ -4,13 +4,18 @@
 	real*8 x
 	real*8 Rayleigh
 	real*8 a0, a1, b1
+	real*8 as, bs
+	dimension as(0:10)
+	dimension bs(10)
 	integer idx
 	real*8 x0, y0
 	real*8 mu
 	real*8 theta
 	real*8 pi
+	real*8 res
 	integer max_loop
 	parameter(max_loop=5000)
+	integer ni
 
 	pi = acos(-1d0)
 C	print *, 'fourier integration'
@@ -29,35 +34,49 @@ C		print *, x, y
 C		x = x + 1d-1
 C	end do
 
-	a0 = 0d0
-	a1 = 0d0
 	b1 = 0d0
+
+	as(0) = 0d0
+	do idx = 1, 10
+		as(idx) = 0d0
+		bs(idx) = 0d0
+	end do
 
 	do idx = 1, max_loop
 		call Halton_sequence(idx, x0, y0)
 		mu = (x0 * 2d0) - 1d0            ! -1.0 to 1.0
 		theta = acos(mu) * 180.0 / pi
 C		print *, idx, theta
-		a0 = a0 + Rayleigh(mu) * cos(theta * 0)
-		a1 = a1 + Rayleigh(mu) * cos(theta * 1)
-		b1 = b1 + Rayleigh(mu) * sin(theta * 1)
+
+		as(0) = as(0) + Rayleigh(mu) * cos(mu * 0)
+		do ni=1,10
+			as(ni) = as(ni) + Rayleigh(mu) * cos(mu * ni)
+			bs(ni) = bs(ni) + Rayleigh(mu) * sin(mu * ni)
+		end do
+C		b1 = b1 + Rayleigh(mu) * sin(mu * 1)
 C		print *, idx, b1 / idx
 	end do
 
-	a0 = a0 / pi / max_loop
-	a1 = a1 / pi / max_loop
-	b1 = b1 / pi / max_loop
+	as(0) = as(0) / pi / max_loop
+	do idx = 1, 10
+		as(idx) = as(idx) / pi / max_loop
+		bs(idx) = bs(idx) / pi / max_loop
+	end do
 
 	theta = 0d0
 	do while(theta <= 180d0)
 		mu = cos(theta * pi / 180d0) 
-		print *, theta, Rayleigh(mu)
+		
+		res = 0.5d0 * as(0)
+		do ni=1,10
+			res = res + as(ni) * cos(mu * ni)
+			res = res + bs(ni) * sin(mu * ni)
+		end do
+
+C		print *, theta, Rayleigh(mu)
+		print *, theta, res
 		theta = theta + 1d-1
 	end do
-
-C	print *, 'a0=', a0
-C	print *, 'a1=', a1
-C	print *, 'b1=', b1
 
 	end
 
