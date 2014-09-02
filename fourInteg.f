@@ -3,10 +3,9 @@
 	real*8 y
 	real*8 x
 	real*8 Rayleigh
-C	real*8 a0, a1, b1
-	real*8 as, bs
 	integer num_term
-	parameter(num_term=10)
+	parameter(num_term=5)
+	real*8 as, bs
 	dimension as(0:num_term)
 	dimension bs(num_term)
 	integer idx
@@ -16,7 +15,7 @@ C	real*8 a0, a1, b1
 	real*8 pi
 	real*8 res
 	integer max_loop
-	parameter(max_loop=5000)
+	parameter(max_loop=1000)
 	integer ni
 
 	pi = acos(-1d0)
@@ -44,23 +43,22 @@ C	end do
 
 	do idx = 1, max_loop
 		call Halton_sequence(idx, x0, y0)
-		mu = (x0 * 2d0) - 1d0            ! [-1.0,1.0]
-		theta = acos(mu) * 180.0 / pi
-C		print *, idx, theta
+C		mu = (x0 * 2d0) - 1d0            ! [-1.0,1.0]
+C		theta = acos(mu) * 180.0 / pi
+		theta = x0 * 180d0     ! [0,180]
+		mu = cos(theta * pi / 180d0)
 
 		as(0) = as(0) + Rayleigh(mu) * cos(mu * dble(0))
 		do ni=1,num_term
 			as(ni) = as(ni) + Rayleigh(mu) * cos(mu * dble(ni))
 			bs(ni) = bs(ni) + Rayleigh(mu) * sin(mu * dble(ni))
 		end do
-C		b1 = b1 + Rayleigh(mu) * sin(mu * 1)
-C		print *, idx, b1 / idx
 	end do
 
-	as(0) = as(0) / pi / max_loop
+	as(0) = as(0) / pi / dble(max_loop)
 	do idx = 1, num_term
-		as(idx) = as(idx) / pi / max_loop
-		bs(idx) = bs(idx) / pi / max_loop
+		as(idx) = as(idx) / pi / dble(max_loop)
+		bs(idx) = bs(idx) / pi / dble(max_loop)
 	end do
 
 	theta = 0d0
@@ -74,7 +72,7 @@ C		print *, idx, b1 / idx
 		end do
 
 C		print *, theta, Rayleigh(mu)
-		print *, theta, res
+		print *, theta, res, Rayleigh(mu)
 		theta = theta + 1d-1
 	end do
 
@@ -86,7 +84,9 @@ C		print *, theta, Rayleigh(mu)
 	implicit none
 	real*8 x, Rayleigh
 
-	Rayleigh = 0.75d0 * (1 + x * x)
+C   TODO0: uncomment	
+C	Rayleigh = 0.75d0 * (1 + x * x)
+	Rayleigh = x
 	end
 
 	subroutine testFunc
