@@ -5,8 +5,10 @@
 	real*8 Rayleigh
 C	real*8 a0, a1, b1
 	real*8 as, bs
-	dimension as(0:10)
-	dimension bs(10)
+	integer num_term
+	parameter(num_term=10)
+	dimension as(0:num_term)
+	dimension bs(num_term)
 	integer idx
 	real*8 x0, y0
 	real*8 mu
@@ -35,7 +37,7 @@ C		x = x + 1d-1
 C	end do
 
 	as(0) = 0d0
-	do idx = 1, 10
+	do idx = 1, num_term
 		as(idx) = 0d0
 		bs(idx) = 0d0
 	end do
@@ -47,7 +49,7 @@ C	end do
 C		print *, idx, theta
 
 		as(0) = as(0) + Rayleigh(mu) * cos(mu * dble(0))
-		do ni=1,10
+		do ni=1,num_term
 			as(ni) = as(ni) + Rayleigh(mu) * cos(mu * dble(ni))
 			bs(ni) = bs(ni) + Rayleigh(mu) * sin(mu * dble(ni))
 		end do
@@ -56,7 +58,7 @@ C		print *, idx, b1 / idx
 	end do
 
 	as(0) = as(0) / pi / max_loop
-	do idx = 1, 10
+	do idx = 1, num_term
 		as(idx) = as(idx) / pi / max_loop
 		bs(idx) = bs(idx) / pi / max_loop
 	end do
@@ -66,7 +68,7 @@ C		print *, idx, b1 / idx
 		mu = cos(theta * pi / 180d0) 
 		
 		res = 0.5d0 * as(0)
-		do ni=1,10
+		do ni=1,num_term
 			res = res + as(ni) * cos(mu * dble(ni))
 			res = res + bs(ni) * sin(mu * dble(ni))
 		end do
