@@ -1,4 +1,6 @@
 
+C 	TODO: Reproduce of Example 2 (a0) of
+C   http://www.math24.net/definition-of-fourier-series.html
 	implicit none
 	real*8 y
 	real*8 x
@@ -6,13 +8,12 @@
 	integer num_term
 	parameter(num_term=5)
 	real*8 as, bs
-	dimension as(0:num_term)
-	dimension bs(num_term)
+	dimension as(0:num_term+1)
+	dimension bs(num_term+1)
 	integer idx
 	real*8 x0, y0
-	real*8 mu
-	real*8 theta
-	real*8 pi
+	real*8 mu, theta, pi
+	real*8 radian
 	real*8 res
 	integer max_loop
 	parameter(max_loop=1000)
@@ -43,23 +44,32 @@ C	end do
 
 	do idx = 1, max_loop
 		call Halton_sequence(idx, x0, y0)
+
 C		mu = (x0 * 2d0) - 1d0            ! [-1.0,1.0]
 C		theta = acos(mu) * 180.0 / pi
-		theta = x0 * 180d0     ! [0,180]
-		mu = cos(theta * pi / 180d0)
+C		theta = (x0 * 2d0 - 1d0) * 180d0     ! [-180,180]
+C		radian = theta * pi / 180d0
+C		mu = cos(radian)
+		radian = x0 * pi    ! [0, pi]		
 
-		as(0) = as(0) + Rayleigh(mu) * cos(mu * dble(0))
+C		as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
+		as(0) = as(0) + 1d0
 		do ni=1,num_term
-			as(ni) = as(ni) + Rayleigh(mu) * cos(mu * dble(ni))
-			bs(ni) = bs(ni) + Rayleigh(mu) * sin(mu * dble(ni))
+			as(ni) = as(ni) + Rayleigh(radian) * cos(radian * dble(ni))
+			bs(ni) = bs(ni) + Rayleigh(radian) * sin(radian * dble(ni))
 		end do
 	end do
 
-	as(0) = as(0) / pi / dble(max_loop)
+	as(0) = as(0) / dble(max_loop)
 	do idx = 1, num_term
 		as(idx) = as(idx) / pi / dble(max_loop)
 		bs(idx) = bs(idx) / pi / dble(max_loop)
 	end do
+
+	print *, 'a0=', as(0)
+	print *, 'a0=', as(0) * 2d0
+	stop "debug"
+
 
 	theta = 0d0
 	do while(theta <= 180d0)
@@ -86,7 +96,14 @@ C		print *, theta, Rayleigh(mu)
 
 C   TODO0: uncomment	
 C	Rayleigh = 0.75d0 * (1 + x * x)
-	Rayleigh = x
+C	Rayleigh = x * x
+
+	if (x .le. 0d0) then
+		Rayleigh = 0d0
+	else
+		Rayleigh = 1d0
+	endif
+
 	end
 
 	subroutine testFunc
