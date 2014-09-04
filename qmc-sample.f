@@ -18,10 +18,12 @@ C         sum = sum + x0
 C         ! case 2: integration 0..1 for y=x*x. result = 1/3 [checked]
 C         sum = sum + (x0 * x0)
 
+         x0 = (x0 * 3d0)    ![0, 3.0]
+
          ! case 3: integartion 0..1 for y=(2x+1). result = 1+1 = 2 [checked]     
          sum = sum + (2d0 * x0 + 1d0)
 
-         res = sum / k0
+         res = sum / k0 * 3d0
          print *, k0, res
       end do
 
