@@ -22,43 +22,14 @@ C	parameter(num_term=10)
 	real*8 xrange
 
 	pi = acos(-1d0)
-C	print *, 'fourier integration'
-
-C   - [x] get y(:) as function of Rayleigh scattering
-C     CCX = CX(I) * CX(I)	
-C     PR(1,1) = 0.75d0 * (1.d0 + CCX)
-C   - [x] get x(.) for given idx
-C   - [-] get y(.) for x(.) by DINPOL()
-C   - summation	
-
-C	x = -1d0
-C	do while(x <= 1d0) 
-C		y = Rayleigh(x)
-C		print *, x, y
-C		x = x + 1d-1
-C	end do
-
-	as(0) = 0d0
-	do idx = 1, num_term
-		as(idx) = 0d0
-		bs(idx) = 0d0
-	end do
-
 	xrange = 2d0 * pi
+
+	as = 0d0
+	bs = 0d0
 
 	do idx = 1, max_loop
 		call Halton_sequence(idx, x0, y0)
-
-C		mu = (x0 * 2d0) - 1d0            ! [-1.0,1.0]
-C		theta = acos(mu) * 180.0 / pi
-C		radian = theta * pi / 180d0
-
-C		theta = (x0 * 2d0 - 1d0) * 180d0     ! [-180,180]
-C		radian = theta * pi / 180d0
-C		mu = cos(radian)
-C		radian = x0 * xrange    ! [0, pi]
-
-		theta = (x0 * 360d0)
+		theta = (x0 * 360d0)   ! [0., 360.]
 		radian = theta * pi / 180d0
 
 		as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
@@ -68,20 +39,10 @@ C		radian = x0 * xrange    ! [0, pi]
 		end do
 	end do
 
-	as(0) = as(0) * xrange
-	do idx = 1, num_term
-		as(idx) = as(idx) * xrange
-		bs(idx) = bs(idx) * xrange
-	end do
-		
-	as(0) = as(0) / pi / dble(max_loop)
-	do idx = 1, num_term
-		as(idx) = as(idx) / pi / dble(max_loop)
-		bs(idx) = bs(idx) / pi / dble(max_loop)
-	end do
-
-C	print *, 'a0=', as(0)
-
+	as = as * xrange
+	bs = bs * xrange
+	as = as / pi / dble(max_loop)
+	bs = bs / pi / dble(max_loop)		
 
 	theta = 0d0
 	do while(theta <= 180d0)
@@ -93,7 +54,6 @@ C	print *, 'a0=', as(0)
 			res = res + bs(ni) * sin(mu * dble(ni))
 		end do
 
-C		print *, theta, Rayleigh(mu)
 		print *, theta, res, Rayleigh(mu)
 		theta = theta + 1d-1
 	end do
