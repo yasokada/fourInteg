@@ -6,8 +6,8 @@ C   http://www.math24.net/definition-of-fourier-series.html
 	real*8 x
 	real*8 Rayleigh
 	integer num_term
-C	parameter(num_term=2)  : most fit for Rayleigh
-	parameter(num_term=10)
+	parameter(num_term=2)  ! most fit for Rayleigh
+C	parameter(num_term=10)
 	real*8 as, bs
 	dimension as(0:num_term+1)
 	dimension bs(num_term+1)
