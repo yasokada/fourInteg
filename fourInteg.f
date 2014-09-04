@@ -1,6 +1,7 @@
 
-C 	TODO: Reproduce of Example 2 (a0) of
+C 	DONE: Reproduce of Example 2 (a0) of
 C   http://www.math24.net/definition-of-fourier-series.html
+
 	implicit none
 	real*8 y
 	real*8 x
@@ -67,24 +68,9 @@ C	parameter(num_term=10)
 	real*8 radian
 	real*8 x, Rayleigh
 
-C   TODO0: uncomment	
 	x = cos(radian)
 	Rayleigh = 0.75d0 * (1 + x * x)
-C	Rayleigh = x * x
 
-
-C	if (x .le. 0d0) then
-C		Rayleigh = 0d0
-C	else
-C		Rayleigh = 1d0
-C	endif
-
-	end
-
-	subroutine testFunc
-
-
-	return 
 	end
 
 !----------------------------------------------------------------------
