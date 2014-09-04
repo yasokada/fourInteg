@@ -6,7 +6,7 @@ C   http://www.math24.net/definition-of-fourier-series.html
 	real*8 x
 	real*8 Rayleigh
 	integer num_term
-	parameter(num_term=20)
+	parameter(num_term=100)
 	real*8 as, bs
 	dimension as(0:num_term+1)
 	dimension bs(num_term+1)
@@ -43,17 +43,22 @@ C	end do
 		bs(idx) = 0d0
 	end do
 
-	xrange = pi
+	xrange = 2d0 * pi
 
 	do idx = 1, max_loop
 		call Halton_sequence(idx, x0, y0)
 
 C		mu = (x0 * 2d0) - 1d0            ! [-1.0,1.0]
 C		theta = acos(mu) * 180.0 / pi
+C		radian = theta * pi / 180d0
+
 C		theta = (x0 * 2d0 - 1d0) * 180d0     ! [-180,180]
 C		radian = theta * pi / 180d0
 C		mu = cos(radian)
-		radian = x0 * xrange    ! [0, pi]
+C		radian = x0 * xrange    ! [0, pi]
+
+		theta = (x0 * 360d0)
+		radian = theta * pi / 180d0
 
 		as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
 		do ni=1,num_term
