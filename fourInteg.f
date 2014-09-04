@@ -6,7 +6,7 @@ C   http://www.math24.net/definition-of-fourier-series.html
 	real*8 x
 	real*8 Rayleigh
 	integer num_term
-	parameter(num_term=5)
+	parameter(num_term=20)
 	real*8 as, bs
 	dimension as(0:num_term+1)
 	dimension bs(num_term+1)
@@ -18,6 +18,7 @@ C   http://www.math24.net/definition-of-fourier-series.html
 	integer max_loop
 	parameter(max_loop=1000)
 	integer ni
+	real*8 xrange
 
 	pi = acos(-1d0)
 C	print *, 'fourier integration'
@@ -42,6 +43,8 @@ C	end do
 		bs(idx) = 0d0
 	end do
 
+	xrange = pi
+
 	do idx = 1, max_loop
 		call Halton_sequence(idx, x0, y0)
 
@@ -50,25 +53,28 @@ C		theta = acos(mu) * 180.0 / pi
 C		theta = (x0 * 2d0 - 1d0) * 180d0     ! [-180,180]
 C		radian = theta * pi / 180d0
 C		mu = cos(radian)
-		radian = x0 * pi    ! [0, pi]		
+		radian = x0 * xrange    ! [0, pi]
 
-C		as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
-		as(0) = as(0) + 1d0
+		as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
 		do ni=1,num_term
 			as(ni) = as(ni) + Rayleigh(radian) * cos(radian * dble(ni))
 			bs(ni) = bs(ni) + Rayleigh(radian) * sin(radian * dble(ni))
 		end do
 	end do
 
-	as(0) = as(0) / dble(max_loop)
+	as(0) = as(0) * xrange
+	do idx = 1, num_term
+		as(idx) = as(idx) * xrange
+		bs(idx) = bs(idx) * xrange
+	end do
+		
+	as(0) = as(0) / pi / dble(max_loop)
 	do idx = 1, num_term
 		as(idx) = as(idx) / pi / dble(max_loop)
 		bs(idx) = bs(idx) / pi / dble(max_loop)
 	end do
 
-	print *, 'a0=', as(0)
-	print *, 'a0=', as(0) * 2d0
-	stop "debug"
+C	print *, 'a0=', as(0)
 
 
 	theta = 0d0
@@ -90,19 +96,22 @@ C		print *, theta, Rayleigh(mu)
 
 !----------------------------------------------------------------------
 
-	function Rayleigh(x)
+	function Rayleigh(radian)
 	implicit none
+	real*8 radian
 	real*8 x, Rayleigh
 
 C   TODO0: uncomment	
-C	Rayleigh = 0.75d0 * (1 + x * x)
+	x = cos(radian)
+	Rayleigh = 0.75d0 * (1 + x * x)
 C	Rayleigh = x * x
 
-	if (x .le. 0d0) then
-		Rayleigh = 0d0
-	else
-		Rayleigh = 1d0
-	endif
+
+C	if (x .le. 0d0) then
+C		Rayleigh = 0d0
+C	else
+C		Rayleigh = 1d0
+C	endif
 
 	end
 
