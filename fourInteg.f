@@ -25,6 +25,7 @@ C	parameter(qmcTerms=1000)
 	real*8 xrange
 	integer argc
 	character*80 argv
+	real*8 tmp_a0, tmp_a1, tmp_b1
 
 	integer fourTerms  ! terms for Fourier expansion 
 					   ! 2: most fit for Rayleigh
@@ -61,7 +62,14 @@ C	fourTerms = 2  ! most fit for Rayleigh
 			as(ni) = as(ni) + Rayleigh(radian) * cos(radian * dble(ni))
 			bs(ni) = bs(ni) + Rayleigh(radian) * sin(radian * dble(ni))
 		end do
+
+		! for a0, a1, b1 as fnc of qmcTerms
+		tmp_a0 = as(0) * xrange / pi / dble(idx)
+		tmp_a1 = as(1) * xrange / pi / dble(idx)
+		tmp_b1 = bs(1) * xrange / pi / dble(idx)
+		write(10, 1000) idx, tmp_a0, tmp_a1, tmp_b1
 	end do
+1000  format(I6, 3(E15.6))
 
 	as = as * xrange
 	bs = bs * xrange
