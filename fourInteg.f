@@ -1,17 +1,19 @@
 
 C 	DONE: Reproduce of Example 2 (a0) of
-C   http://www.math24.net/definition-of-fourier-series.html
-
+C     http://www.math24.net/definition-of-fourier-series.html
+C   DONE: Reproduce of Rayeligh phase function
+C
 	implicit none
-	real*8 y
-	real*8 x
+
+C	functions
 	real*8 Rayleigh
-	integer num_term
-	parameter(num_term=2)  ! most fit for Rayleigh
-C	parameter(num_term=10)
+
+C	variables
+	integer MAX_FOUR_TERM
+	parameter(MAX_FOUR_TERM=500)  ! 500: arbitrary
 	real*8 as, bs
-	dimension as(0:num_term+1)
-	dimension bs(num_term+1)
+	dimension as(0:MAX_FOUR_TERM)
+	dimension bs(MAX_FOUR_TERM)
 	integer idx
 	real*8 x0, y0
 	real*8 mu, theta, pi
@@ -21,6 +23,10 @@ C	parameter(num_term=10)
 	parameter(max_loop=1000)
 	integer ni
 	real*8 xrange
+
+	integer num_term  ! terms for Fourier expansion 
+
+	num_term = 2  ! most fit for Rayleigh
 
 	pi = acos(-1d0)
 	xrange = 2d0 * pi
@@ -45,7 +51,7 @@ C	parameter(num_term=10)
 	as = as / pi / dble(max_loop)
 	bs = bs / pi / dble(max_loop)		
 
-	theta = 0d0
+	theta = 0d0  ! [0., 180.]
 	do while(theta <= 180d0)
 		mu = cos(theta * pi / 180d0) 
 		
