@@ -19,8 +19,8 @@ C	variables
 	real*8 mu, theta, pi
 	real*8 radian
 	real*8 res
-	integer max_loop
-	parameter(max_loop=1000)
+	integer qmcTerms
+C	parameter(qmcTerms=1000)
 	integer ni
 	real*8 xrange
 	integer argc
@@ -30,16 +30,18 @@ C	variables
 					   ! 2: most fit for Rayleigh
 
 	argc = iargc()
-	if (argc .eq. 0) then
+	if (argc .le. 1) then
 		print *, 'Command invalid: Execute as follows'
-		print *, '   [cmd] [Number of fourier terms (1..499)]'
-		print *, 'For example'
-		print *, '   ./a.out 2 > res.2'
+		print *, '   [cmd] [Num Fourier terms (1..499)] [Num QMC Integ]'
+		print *, 'For 2 Fourier terms, and 100 QMC terms'
+		print *, '   ./a.out 2 1000 > res.2_1000'
 		stop
 	end if
 
 	call getarg(1, argv)
 	read(argv,*) fourTerms
+	call getarg(2, argv)
+	read(argv,*) qmcTerms
 
 C	fourTerms = 2  ! most fit for Rayleigh
 
@@ -49,7 +51,7 @@ C	fourTerms = 2  ! most fit for Rayleigh
 	as = 0d0
 	bs = 0d0
 
-	do idx = 1, max_loop
+	do idx = 1, qmcTerms
 		call Halton_sequence(idx, x0, y0)
 		theta = (x0 * 360d0)   ! [0., 360.]
 		radian = theta * pi / 180d0
@@ -63,8 +65,8 @@ C	fourTerms = 2  ! most fit for Rayleigh
 
 	as = as * xrange
 	bs = bs * xrange
-	as = as / pi / dble(max_loop)
-	bs = bs / pi / dble(max_loop)		
+	as = as / pi / dble(qmcTerms)
+	bs = bs / pi / dble(qmcTerms)		
 
 	theta = 0d0  ! [0., 180.]
 	do while(theta <= 180d0)
