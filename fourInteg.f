@@ -24,9 +24,9 @@ C	variables
 	integer ni
 	real*8 xrange
 
-	integer num_term  ! terms for Fourier expansion 
+	integer fourTerms  ! terms for Fourier expansion 
 
-	num_term = 2  ! most fit for Rayleigh
+	fourTerms = 2  ! most fit for Rayleigh
 
 	pi = acos(-1d0)
 	xrange = 2d0 * pi
@@ -40,7 +40,7 @@ C	variables
 		radian = theta * pi / 180d0
 
 		as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
-		do ni=1,num_term
+		do ni=1,fourTerms
 			as(ni) = as(ni) + Rayleigh(radian) * cos(radian * dble(ni))
 			bs(ni) = bs(ni) + Rayleigh(radian) * sin(radian * dble(ni))
 		end do
@@ -56,7 +56,7 @@ C	variables
 		mu = cos(theta * pi / 180d0) 
 		
 		res = 0.5d0 * as(0)
-		do ni=1,num_term
+		do ni=1,fourTerms
 			res = res + as(ni) * cos(mu * dble(ni))
 			res = res + bs(ni) * sin(mu * dble(ni))
 		end do
