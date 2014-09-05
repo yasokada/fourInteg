@@ -23,10 +23,25 @@ C	variables
 	parameter(max_loop=1000)
 	integer ni
 	real*8 xrange
+	integer argc
+	character*80 argv
 
 	integer fourTerms  ! terms for Fourier expansion 
+					   ! 2: most fit for Rayleigh
 
-	fourTerms = 2  ! most fit for Rayleigh
+	argc = iargc()
+	if (argc .eq. 0) then
+		print *, 'Command invalid: Execute as follows'
+		print *, '   [cmd] [Number of fourier terms (1..499)]'
+		print *, 'For example'
+		print *, '   ./a.out 2 > res.2'
+		stop
+	end if
+
+	call getarg(1, argv)
+	read(argv,*) fourTerms
+
+C	fourTerms = 2  ! most fit for Rayleigh
 
 	pi = acos(-1d0)
 	xrange = 2d0 * pi
@@ -62,6 +77,7 @@ C	variables
 		end do
 
 		print *, theta, res, Rayleigh(mu)
+
 		theta = theta + 1d-1
 	end do
 
