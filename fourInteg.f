@@ -3,95 +3,97 @@ C 	DONE: Reproduce of Example 2 (a0) of
 C     http://www.math24.net/definition-of-fourier-series.html
 C   DONE: Reproduce of Rayeligh phase function
 C
-	implicit none
+      implicit none
 
 C	functions
-	real*8 Rayleigh
+      real*8 Rayleigh
 
 C	variables
-	integer MAX_FOUR_TERM
-	parameter(MAX_FOUR_TERM=500)  ! 500: arbitrary
-	real*8 as, bs
-	dimension as(0:MAX_FOUR_TERM)
-	dimension bs(MAX_FOUR_TERM)
-	integer idx
-	real*8 x0, y0
-	real*8 mu, theta, pi
-	real*8 radian
-	real*8 res
-	integer qmcTerms
-C	parameter(qmcTerms=1000)
-	integer ni
-	real*8 xrange
-	integer argc
-	character*80 argv
-	real*8 tmp_a0, tmp_a1, tmp_b1
+      integer MAX_FOUR_TERM
+      parameter(MAX_FOUR_TERM=500)  ! 500: arbitrary
+      real*8 as, bs
+      dimension as(0:MAX_FOUR_TERM)
+      dimension bs(MAX_FOUR_TERM)
+      integer idx
+      real*8 x0, y0
+      real*8 mu, theta, pi
+      real*8 radian
+      real*8 res
+      integer qmcTerms
+      integer ni
+      real*8 xrange
+      integer argc
+      character*80 argv
+      real*8 tmp_a0, tmp_a1, tmp_b1
 
-	integer fourTerms  ! terms for Fourier expansion 
+      integer fourTerms  ! terms for Fourier expansion 
 					   ! 2: most fit for Rayleigh
 
-	argc = iargc()
-	if (argc .le. 1) then
-		print *, 'Command invalid: Execute as follows'
-		print *, '   [cmd] [Num Fourier terms (1..499)] [Num QMC Integ]'
-		print *, 'For 2 Fourier terms, and 100 QMC terms'
-		print *, '   ./a.out 2 1000 > res.2_1000'
-		stop
-	end if
+      argc = iargc()
+      if (argc .le. 1) then
+         print *, 'Command invalid: Execute as follows'
+         print *, '   [cmd] [Num Fourier terms] [Num QMC Integ]'
+         print *, 'For 2 Fourier terms, and 100 QMC terms'
+         print *, '   ./a.out 2 1000 > res.2_1000'
+         stop
+      end if
 
-	call getarg(1, argv)
-	read(argv,*) fourTerms
-	call getarg(2, argv)
-	read(argv,*) qmcTerms
+      call getarg(1, argv)
+      read(argv,*) fourTerms
+      call getarg(2, argv)
+      read(argv,*) qmcTerms
 
-C	fourTerms = 2  ! most fit for Rayleigh
+      if (fourTerms .ge. 500) then
+         print *, 'Fourier terms should be less than 500'
+         stop
+      end if
 
-	pi = acos(-1d0)
-	xrange = 2d0 * pi
+      pi = acos(-1d0)
+      xrange = 2d0 * pi
 
-	as = 0d0
-	bs = 0d0
+      as = 0d0
+      bs = 0d0
 
-	do idx = 1, qmcTerms
-		call Halton_sequence(idx, x0, y0)
-		theta = (x0 * 360d0)   ! [0., 360.]
-		radian = theta * pi / 180d0
+      do idx = 1, qmcTerms
+         call Halton_sequence(idx, x0, y0)
+         theta = (x0 * 360d0)   ! [0., 360.]
+         radian = theta * pi / 180d0
 
-		as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
-		do ni=1,fourTerms
-			as(ni) = as(ni) + Rayleigh(radian) * cos(radian * dble(ni))
-			bs(ni) = bs(ni) + Rayleigh(radian) * sin(radian * dble(ni))
-		end do
+         as(0) = as(0) + Rayleigh(radian) * cos(radian * dble(0))
+         do ni=1,fourTerms
+            as(ni) = as(ni) + Rayleigh(radian) * cos(radian * dble(ni))
+            bs(ni) = bs(ni) + Rayleigh(radian) * sin(radian * dble(ni))
+         end do
 
-		! for a0, a1, b1 as fnc of qmcTerms
-		tmp_a0 = as(0) * xrange / pi / dble(idx)
-		tmp_a1 = as(1) * xrange / pi / dble(idx)
-		tmp_b1 = bs(1) * xrange / pi / dble(idx)
-		write(10, 1000) idx, tmp_a0, tmp_a1, tmp_b1
-	end do
+         ! for a0, a1, b1 as fnc of qmcTerms
+         tmp_a0 = as(0) * xrange / pi / dble(idx)
+         tmp_a1 = as(1) * xrange / pi / dble(idx)
+         tmp_b1 = bs(1) * xrange / pi / dble(idx)
+         write(10, 1000) idx, tmp_a0, tmp_a1, tmp_b1
+      end do
 1000  format(I6, 3(E15.6))
 
-	as = as * xrange
-	bs = bs * xrange
-	as = as / pi / dble(qmcTerms)
-	bs = bs / pi / dble(qmcTerms)		
+      as = as * xrange
+      bs = bs * xrange
+      as = as / pi / dble(qmcTerms)
+      bs = bs / pi / dble(qmcTerms)		
 
-	theta = 0d0  ! [0., 180.]
-	do while(theta <= 180d0)
-		mu = cos(theta * pi / 180d0) 
+      theta = 0d0  ! [0., 180.]
+      do while(theta <= 180d0)
+         mu = cos(theta * pi / 180d0) 
 		
-		res = 0.5d0 * as(0)
-		do ni=1,fourTerms
-			res = res + as(ni) * cos(mu * dble(ni))
-			res = res + bs(ni) * sin(mu * dble(ni))
-		end do
+         res = 0.5d0 * as(0)
+         do ni=1,fourTerms
+            res = res + as(ni) * cos(mu * dble(ni))
+            res = res + bs(ni) * sin(mu * dble(ni))
+         end do
 
-		print *, theta, res, Rayleigh(mu)
+         print *, theta, res, Rayleigh(mu)
 
-		theta = theta + 1d-1
-	end do
+         theta = theta + 1d-1
+      end do
 
-	end
+      end
 
 !----------------------------------------------------------------------
 
