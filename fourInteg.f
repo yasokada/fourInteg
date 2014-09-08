@@ -80,15 +80,15 @@ C	variables
 
       theta = 0d0  ! [0., 180.]
       do while(theta <= 180d0)
-         mu = cos(theta * pi / 180d0) 
+         radian = theta * pi / 180d0
 		
          res = 0.5d0 * as(0)
          do ni=1,fourTerms
-            res = res + as(ni) * cos(mu * dble(ni))
-            res = res + bs(ni) * sin(mu * dble(ni))
+            res = res + as(ni) * cos(radian * dble(ni))
+            res = res + bs(ni) * sin(radian * dble(ni))
          end do
 
-         print *, theta, res, Rayleigh(mu)
+         print *, theta, res, Rayleigh(radian)
 
          theta = theta + 1d-1
       end do
